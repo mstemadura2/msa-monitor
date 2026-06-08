@@ -5,7 +5,8 @@ import {
   Server, Cpu, HardDrive, MemoryStick, Activity,
   Cloud, Shield, Clock, RefreshCw, ExternalLink,
   ArrowUpRight, AlertTriangle, CheckCircle2,
-  XCircle, FileText, Gauge, Globe, Lock, Terminal
+  XCircle, FileText, Gauge, Globe, Lock, Terminal,
+  LogOut
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -70,6 +71,7 @@ export default function MonitorDashboard() {
   });
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [refreshCountdown, setRefreshCountdown] = useState(30);
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
 
   const fetchAllData = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
@@ -99,12 +101,29 @@ export default function MonitorDashboard() {
 
   // Initial fetch on mount
   useEffect(() => {
-    void fetchAllData();
+    // Check authentication first
+    fetch('/api/auth/check').then(r => {
+      if (r.ok) {
+        setAuthenticated(true);
+        void fetchAllData();
+      } else {
+        setAuthenticated(false);
+        window.location.href = '/login';
+      }
+    }).catch(() => {
+      setAuthenticated(false);
+      window.location.href = '/login';
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleLogout = async () => {
+    await fetch('/api/auth', { method: 'DELETE' });
+    window.location.href = '/login';
+  };
+
   useEffect(() => {
-    if (!autoRefresh) return;
+    if (!autoRefresh || !authenticated) return;
     const interval = setInterval(() => {
       setRefreshCountdown(prev => {
         if (prev <= 1) {
@@ -115,7 +134,21 @@ export default function MonitorDashboard() {
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [autoRefresh, fetchAllData]);
+  }, [autoRefresh, fetchAllData, authenticated]);
+
+  // Loading state while checking auth
+  if (authenticated === null) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex items-center gap-3">
+          <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+          <span className="text-sm text-muted-foreground">Checking session...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!authenticated) return null;
 
   const getStatusColor = (percent: number) => {
     if (percent < 60) return 'text-emerald-400';
@@ -191,6 +224,13 @@ export default function MonitorDashboard() {
             >
               <ExternalLink className="w-4 h-4" />
             </a>
+            <button
+              onClick={handleLogout}
+              className="p-2 rounded-lg hover:bg-accent transition-colors text-muted-foreground hover:text-destructive"
+              title="Logout"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </header>
