@@ -2,19 +2,19 @@
 // MSA Monitor — Login API Route
 // ============================================================================
 import { NextResponse } from 'next/server';
-import { validatePassword, createSession, destroySession, SESSION_COOKIE } from '@/lib/auth';
+import { validateCredentials, createSession, destroySession, SESSION_COOKIE } from '@/lib/auth';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { password } = body;
+    const { username, password } = body;
 
-    if (!password) {
-      return NextResponse.json({ error: 'Password wajib diisi' }, { status: 400 });
+    if (!username || !password) {
+      return NextResponse.json({ error: 'Email dan password wajib diisi' }, { status: 400 });
     }
 
-    if (!validatePassword(password)) {
-      return NextResponse.json({ error: 'Password salah' }, { status: 401 });
+    if (!validateCredentials(username, password)) {
+      return NextResponse.json({ error: 'Email atau password salah' }, { status: 401 });
     }
 
     const session = createSession();
