@@ -5,7 +5,7 @@ import { randomBytes } from 'crypto';
 
 // Credentials from env variables
 const MONITOR_USERNAME = process.env.MONITOR_USERNAME || 'monitor@msa-idn.com';
-const MONITOR_PASSWORD = process.env.MONITOR_PASSWORD || 'pSknhKiUC1v8Uqg5';
+const MONITOR_PASSWORD = process.env.MONITOR_PASSWORD || 'msa2026admin';
 
 // Session token validity (24 hours)
 const SESSION_DURATION = 24 * 60 * 60 * 1000;
