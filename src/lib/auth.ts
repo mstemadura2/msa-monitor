@@ -3,8 +3,7 @@
 // ============================================================================
 import { randomBytes } from 'crypto';
 
-// Credentials from env variables
-const MONITOR_USERNAME = process.env.MONITOR_USERNAME || 'monitor@msa-idn.com';
+// Password from env variable
 const MONITOR_PASSWORD = process.env.MONITOR_PASSWORD || 'msa2026admin';
 
 // Session token validity (24 hours)
@@ -15,19 +14,19 @@ function generateToken(): string {
   return randomBytes(32).toString('hex');
 }
 
-// Validate credentials (username + password)
-export function validateCredentials(username: string, password: string): boolean {
-  return username === MONITOR_USERNAME && password === MONITOR_PASSWORD;
+// Validate password
+export function validatePassword(password: string): boolean {
+  return password === MONITOR_PASSWORD;
 }
 
 // Create session token
 export function createSession(): { token: string; expires: number } {
   const token = generateToken();
   const expires = Date.now() + SESSION_DURATION;
-  
+
   // Store in memory (simple approach for single-server)
   activeSessions.set(token, expires);
-  
+
   return { token, expires };
 }
 
