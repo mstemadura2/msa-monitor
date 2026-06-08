@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     const response = NextResponse.json({ success: true });
     response.cookies.set(SESSION_COOKIE, session.token, {
       httpOnly: true,
-      secure: true,
+      secure: false,
       sameSite: 'lax',
       expires: session.expires,
       path: '/',
@@ -49,7 +49,7 @@ export async function DELETE(request: Request) {
   const response = NextResponse.json({ success: true });
   response.cookies.set(SESSION_COOKIE, '', {
     httpOnly: true,
-    secure: true,
+    secure: false,
     sameSite: 'lax',
     expires: new Date(0),
     path: '/',
