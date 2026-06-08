@@ -11,7 +11,7 @@ export async function GET(request: Request) {
     .find(c => c.startsWith(SESSION_COOKIE + '='))
     ?.split('=')[1];
 
-  if (!token || !validateSession(token)) {
+  if (!token || !(await validateSession(token))) {
     return NextResponse.json({ authenticated: false }, { status: 401 });
   }
 

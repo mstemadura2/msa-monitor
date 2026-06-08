@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Password salah' }, { status: 401 });
     }
 
-    const session = createSession();
+    const session = await createSession();
 
     const response = NextResponse.json({ success: true });
     response.cookies.set(SESSION_COOKIE, session.token, {
